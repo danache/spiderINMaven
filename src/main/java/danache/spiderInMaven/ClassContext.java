@@ -4,21 +4,23 @@ import java.util.List;
 
 
 public class ClassContext {
-	 List<String> restult;
-	 String cityName;
+	List<dataStruct> PMdatares;
+	 List<String> URLresult;
+
 	 
-	 public ClassContext(List<String> res, String _city) {
+	 public ClassContext(List<String> URLres, List<dataStruct> data) {
 		// TODO Auto-generated constructor stub
-		 restult = res;
-		 cityName = _city;
+		 URLresult = URLres;
+		 PMdatares = data;
+
 	}
-	 public List<String> GetList(){
-		 return restult;
+
+	 public List<String> GetURLList(){
+		 return URLresult;
 	 }
-	 
-	 public String getCityName(){
-		 return cityName;
+	 public List<dataStruct> getPMdata(){
+		 return PMdatares;
 		 
 	 }
-
 }
+

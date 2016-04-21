@@ -1,6 +1,7 @@
 package danache.spiderInMaven;
 
 import java.util.ArrayList;
+import danache.spiderInMaven.dataStruct;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,33 +18,27 @@ import us.codecraft.xsoup.Xsoup;
 
 public class judge {
 	public ClassContext exact(String htmls) {
-		List<String> results = new ArrayList();
+		List<dataStruct> PMresults = new ArrayList();
+		List<String> URLresults = new ArrayList();
+
 		Document doc = Jsoup.parse(htmls);
 		String result = Xsoup.select(doc, "//div[@class='container-fluid']/footer/p/text()").get();
 		Pattern pattern2 = Pattern.compile("(?<=时间).*?(?=。空气)");
 		Matcher matcher2 = pattern2.matcher(result);
-		String tmp = "";
+		String dataTime = "";
 		while (matcher2.find()) {
-			tmp += matcher2.group();
+			dataTime += matcher2.group();
 		}
-
-		/// List<String> ss = page.getHtml().xpath("//ul[@class='nav
-		/// nav-list']/li/a/@href").all();
-		/// 抽取網頁
-		/// List<String> ss = page.getHtml().xpath("//div[@class='span4
-		/// pmblock']/h2/div/div/a/@href").all();
-		/// 抽取城市
-		///
 		String cityurl = Xsoup.select(doc, "link[@rel='canonical']/@href").get();
 		Pattern pattern3 = Pattern.compile("(?<=city/).*?(?=.html)");
 		Matcher matcher3 = pattern3.matcher(cityurl);
-		String tmpss = "";
+		String cityname = "";
 		while (matcher3.find()) {
-			tmpss += matcher3.group();
+			cityname += matcher3.group();
 		}
 
-		List<String> ss = Xsoup.select(doc, "//div[@class='span4 pmblock']").list();
-		Iterator it1 = ss.iterator();
+		List<String> stations = Xsoup.select(doc, "//div[@class='span4 pmblock']").list();
+		Iterator it1 = stations.iterator();
 		while (it1.hasNext()) {
 			String stan = (String) it1.next();
 			String stanname = Xsoup.select(stan, "div[@class='staname']/@title").get();
@@ -71,15 +66,23 @@ public class judge {
 					} else {
 						pm10 = -1;
 					}
-					String output_result = stanname + " PM2.5: " + pm25_str + " PM10: " + pm10_str;
-					results.add(output_result);
+					//String output_result = stanname + " PM2.5: " + pm25_str + " PM10: " + pm10_str;
+					PMresults.add(new dataStruct(cityname, stanname, dataTime, pm25_str, pm10_str));
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
-					}
-		return new ClassContext(results, tmpss);
+			List<String> GetProVince = Xsoup.select(doc, "//ul[@class='nav nav-list']/li/a/@href").list();
+	    	
+		   			   	 
+		   	Iterator proit = GetProVince.iterator();
+		   	
+		   	while (proit.hasNext()) {
+		   		String temps = (String) proit.next();
+		        URLresults.add(temps);
+		   	}
+		}
+		return new ClassContext(URLresults, PMresults);
 	}
-	
-}
 
+}
