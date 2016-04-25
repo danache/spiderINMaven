@@ -12,5 +12,7 @@ public class StaticIdentifier {
 	public final static String timestamp = "timestamp";
 	public final static String databaseName = "pmdata";
 	public final static String urlbaseName = "SpiderURL";
+	public final static String urlbaseFamily = "visited";
+	public final static String numqualifier = "num";
 
 }

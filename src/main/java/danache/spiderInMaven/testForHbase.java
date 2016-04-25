@@ -1,8 +1,11 @@
 package danache.spiderInMaven;
 import java.io.IOException; 
 import java.util.ArrayList; 
-import java.util.List; 
- 
+import java.util.List;
+
+import javax.inject.Qualifier;
+
+import org.apache.commons.lang.ObjectUtils.Null;
 import org.apache.hadoop.conf.Configuration; 
 import org.apache.hadoop.hbase.HBaseConfiguration; 
 import org.apache.hadoop.hbase.HColumnDescriptor; 
@@ -23,7 +26,9 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList; 
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter; 
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp; 
-import org.apache.hadoop.hbase.util.Bytes; 
+import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.htrace.fasterxml.jackson.annotation.JsonTypeInfo.None;
+import org.relaxng.datatype.helpers.ParameterlessDatatypeBuilder; 
  
 public class testForHbase { 
  
@@ -34,25 +39,30 @@ public class testForHbase {
     } 
  
     public static void main(String[] args) throws IOException { 
-        createTable("SpiderURL"); 
-        String tableName = "SpiderURL";
-		String testTable = "testTable";
-		String initURL = "http://www.soupm25.com/city/jinan.html";
-		createTable(tableName);
-		insertData(tableName,initURL,"no");
-		 insertData(tableName,"test1no","no");
-		 insertData(tableName,"test2yes","yes");
-		 insertData(tableName,"test3yes","yes");
-         QueryAll("SpiderURL"); 
+       //createTable("SpiderURL"); 
+    	/*
+    createTable(StaticIdentifier.urlbaseName, StaticIdentifier.urlbaseFamily);
+    	String initURL1 = "http://www.soupm25.com/city/jinan.html";
+    	String initURL2 = "http://www.soupm25.com/city/beijing.html";
+    	insertData(StaticIdentifier.urlbaseName, initURL1, StaticIdentifier.urlbaseFamily, "", StaticIdentifier.noVisited);
+    	insertData(StaticIdentifier.urlbaseName, initURL2, StaticIdentifier.urlbaseFamily, "", StaticIdentifier.noVisited);
+    
+    	createTable(StaticIdentifier.databaseName, StaticIdentifier.PMdataFamilyInHbase);
+    	*/
+    	QueryAll(StaticIdentifier.databaseName);
+    	QueryAll(StaticIdentifier.urlbaseName);
+        //String testTable = "testTable";
+	
+
         // QueryByCondition1("wujintao"); 
         // QueryByCondition2("wujintao"); 
         //QueryByCondition3("wujintao"); 
         //deleteRow("wujintao","abcdef"); 
-        deleteByCondition("wujintao","abcdef"); 
+       // deleteByCondition("wujintao","abcdef"); 
     } 
  
      
-    public static void createTable(String tableName) { 
+    public static void createTable(String tableName, String famaly) { 
         System.out.println("start create table ......"); 
         try { 
             HBaseAdmin hBaseAdmin = new HBaseAdmin(configuration); 
@@ -62,7 +72,7 @@ public class testForHbase {
                 System.out.println(tableName + " is exist,detele...."); 
             } 
             HTableDescriptor tableDescriptor = new HTableDescriptor(tableName); 
-            tableDescriptor.addFamily(new HColumnDescriptor("visited")); 
+            tableDescriptor.addFamily(new HColumnDescriptor(famaly)); 
           
             hBaseAdmin.createTable(tableDescriptor); 
         } catch (MasterNotRunningException e) { 
@@ -76,13 +86,19 @@ public class testForHbase {
     } 
  
      
-    public static void insertData(String tableName, String rowkey, String status) throws IOException { 
+    public static void insertData(String tableName, String rowkey,String family, String qualifier, String status) throws IOException { 
         System.out.println("start insert data ......"); 
         HTablePool pool = new HTablePool(configuration, 1000); 
         HTable table = new HTable(configuration, tableName);
         Put put = new Put(rowkey.getBytes());// 一个PUT代表一行数据，再NEW一个PUT表示第二行数据,每行一个唯一的ROWKEY，此处rowkey为put构造方法中传入的值 
-        put.add("visited".getBytes(), null, status.getBytes());// 本行数据的第一列 
-   
+        if (!qualifier.isEmpty()){
+        	put.add(family.getBytes(), qualifier.getBytes(), status.getBytes());// 本行数据的第一列 
+        }
+        else
+        {
+        	put.add(family.getBytes(),null, status.getBytes());
+        }
+      
         try { 
             table.put(put); 
         } catch (IOException e) { 

@@ -32,11 +32,12 @@ public class judge {
 		String cityurl = Xsoup.select(doc, "link[@rel='canonical']/@href").get();
 		Pattern pattern3 = Pattern.compile("(?<=city/).*?(?=.html)");
 		Matcher matcher3 = pattern3.matcher(cityurl);
+		Pattern pattern4 = Pattern.compile("(?<=//).*");
 		String cityname = "";
 		while (matcher3.find()) {
 			cityname += matcher3.group();
 		}
-
+		int num = 0;
 		List<String> stations = Xsoup.select(doc, "//div[@class='span4 pmblock']").list();
 		Iterator it1 = stations.iterator();
 		while (it1.hasNext()) {
@@ -66,21 +67,27 @@ public class judge {
 					} else {
 						pm10 = -1;
 					}
-					//String output_result = stanname + " PM2.5: " + pm25_str + " PM10: " + pm10_str;
-					PMresults.add(new dataStruct(cityname, stanname, dataTime, pm25_str, pm10_str));
+					// String output_result = stanname + " PM2.5: " + pm25_str +
+					// " PM10: " + pm10_str;
+					PMresults.add(new dataStruct(cityname, stanname, dataTime, pm25_str, pm10_str, num));
+					num++;
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
 			List<String> GetProVince = Xsoup.select(doc, "//ul[@class='nav nav-list']/li/a/@href").list();
-	    	
-		   			   	 
-		   	Iterator proit = GetProVince.iterator();
-		   	
-		   	while (proit.hasNext()) {
-		   		String temps = (String) proit.next();
-		        URLresults.add(temps);
-		   	}
+
+			Iterator proit = GetProVince.iterator();
+
+			while (proit.hasNext()) {
+				String tmpurl = (String) proit.next();
+				Matcher matcher4 = pattern4.matcher(tmpurl);
+				String matchurl = "";
+				while (matcher4.find()) {
+					matchurl += matcher4.group();
+				}
+				URLresults.add(("http://"+matchurl));
+			}
 		}
 		return new ClassContext(URLresults, PMresults);
 	}

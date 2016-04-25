@@ -2,10 +2,12 @@ package danache.spiderInMaven;
 
 import java.io.IOException;
 
+import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
+import danache.spiderInMaven.testForHbase;
 
 public class URLReducer extends Reducer<NullWritable, Text, Text, Text> {
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {

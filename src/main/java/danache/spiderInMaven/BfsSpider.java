@@ -1,9 +1,5 @@
 package danache.spiderInMaven;
 
-import java.util.Set;
-
-
-import us.codecraft.webmagic.Spider;
 
 public class BfsSpider {
 
