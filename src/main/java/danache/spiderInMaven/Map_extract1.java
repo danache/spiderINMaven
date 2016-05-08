@@ -51,21 +51,7 @@ public class Map_extract1 extends Mapper<Object, BytesWritable, ImmutableBytesWr
 				
 			}
 		}
-		Put put21 = new Put(("loooooooop"+Long.toString(System.currentTimeMillis())).getBytes());
-		put21.add(StaticIdentifier.PMdataFamilyInHbase.getBytes(), StaticIdentifier.citynamequalifier.getBytes(), String.valueOf(loop).getBytes());
-		if (!put21.isEmpty()) {
-			ImmutableBytesWritable ib = new ImmutableBytesWritable();
-			ib.set(Bytes.toBytes(StaticIdentifier.databaseName));
-			context.write(ib, put21);// 将结果存入hbase表
-		}
-	
-		Put put22 = new Put(("testnum"+Long.toString(System.currentTimeMillis())).getBytes());
-		put22.add(StaticIdentifier.PMdataFamilyInHbase.getBytes(), StaticIdentifier.citynamequalifier.getBytes(), String.valueOf(num).getBytes());
-		if (!put22.isEmpty()) {
-			ImmutableBytesWritable ib = new ImmutableBytesWritable();
-			ib.set(Bytes.toBytes(StaticIdentifier.databaseName));
-			context.write(ib, put22);// 将结果存入hbase表
-		}
+		
 		Iterator urlIT = URLresults.iterator();
 		while (urlIT.hasNext()) {
 			

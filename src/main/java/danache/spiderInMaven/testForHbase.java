@@ -57,6 +57,7 @@ public class testForHbase {
 		
 		//insertByURL(QueryURL(StaticIdentifier.tmpurlbaseName));
 		//QueryAll(StaticIdentifier.tmpurlbaseName);
+		createTable(StaticIdentifier.databaseName, StaticIdentifier.PMdataFamilyInHbase);
 		QueryAll(StaticIdentifier.databaseName);
 		//QueryAll(StaticIdentifier.urlbaseName);
 
@@ -67,6 +68,7 @@ public class testForHbase {
 		// QueryByCondition3("wujintao");
 		// deleteRow("wujintao","abcdef");
 		// deleteByCondition("wujintao","abcdef");
+	
 	}
 
 	public static void createTable(String tableName, String famaly) {
@@ -251,6 +253,35 @@ public class testForHbase {
 
 	}
 
+	 public static void getResultScann(String tableName, String start_rowkey,
+	            String stop_rowkey) throws IOException {
+	        Scan scan = new Scan();
+	        scan.setStartRow(Bytes.toBytes(start_rowkey));
+	        scan.setStopRow(Bytes.toBytes(stop_rowkey));
+	        ResultScanner rs = null;
+	        HTable table = new HTable(configuration, Bytes.toBytes(tableName));
+	        try {
+	            rs = table.getScanner(scan);
+	            for (Result r : rs) {
+	                for (KeyValue kv : r.list()) {
+	                    System.out.println("row:" + Bytes.toString(kv.getRow()));
+	                    System.out.println("family:"
+	                            + Bytes.toString(kv.getFamily()));
+	                    System.out.println("qualifier:"
+	                            + Bytes.toString(kv.getQualifier()));
+	                    System.out
+	                            .println("value:" + Bytes.toString(kv.getValue()));
+	                    System.out.println("timestamp:" + kv.getTimestamp());
+	                    System.out
+	                            .println("-------------------------------------------");
+	                }
+	            }
+	        } finally {
+	            rs.close();
+	        }
+	    }
+	 
+	
 	public static void QueryByCondition3(String tableName) {
 
 		try {
