@@ -5,6 +5,7 @@
 /home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/InsertReuducer.java
 /home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/DownTool.java
 /home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/WholeFileRecordReader.java
+/home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/queryAndInsert.java
 /home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/Mapper1.java
 /home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/MultipleOutputsReducer.java
 /home/danache/workspace/spiderInMaven/src/main/java/danache/spiderInMaven/testForHbase.java

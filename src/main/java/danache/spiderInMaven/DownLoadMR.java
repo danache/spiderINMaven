@@ -38,103 +38,98 @@ public class DownLoadMR {
 	}
 
 	public static void main(String[] args) throws Exception {
-
 		Configuration conf = new Configuration();
 		Configuration configuration = HBaseConfiguration.create();
-
-		Job jobgeturl = new Job(configuration, "example");
-		jobgeturl.setJarByClass(Downloader.class);
-
 		Scan scan = new Scan();
 		scan.setCaching(500);
 		scan.setCacheBlocks(false);
-
-		TableMapReduceUtil.initTableMapperJob(StaticIdentifier.urlbaseName, scan, URLMapper.class, NullWritable.class, Text.class,
-				jobgeturl);
-		jobgeturl.setNumReduceTasks(1); 
-		FileOutputFormat.setOutputPath(jobgeturl, new Path("/spider")); 
-		jobgeturl.setReducerClass(URLReducer.class);
-		ControlledJob ctrljobgeturl = new ControlledJob(configuration);
-		ctrljobgeturl.setJob(jobgeturl);
-
-		Job jobUpdateURL = new Job(configuration, "updateURL");
+	//	testForHbase.createTable(StaticIdentifier.urlbaseName, StaticIdentifier.urlbaseFamily);
 		
-		jobUpdateURL.setJarByClass(DownLoadMR.class);
-		jobUpdateURL.setInputFormatClass(TextInputFormat.class);
-		FileInputFormat.addInputPath(jobUpdateURL, new Path("/spider"));
-		
-		jobUpdateURL.setMapOutputKeyClass(Text.class);
-		jobUpdateURL.setMapOutputValueClass(Text.class);
-		jobUpdateURL.setMapperClass(InsertMapper.class);
-		TableMapReduceUtil.initTableReducerJob(StaticIdentifier.urlbaseName,
-				InsertReuducer.class, jobUpdateURL);
-		ControlledJob ctrljobUpdateURL = new ControlledJob(configuration);
-		ctrljobUpdateURL.setJob(jobUpdateURL); // 依赖关系
-		ctrljobUpdateURL.addDependingJob(ctrljobgeturl);
-		
+/*
+			Job jobgeturl = new Job(configuration, "example");
+			jobgeturl.setJarByClass(Downloader.class);
 
+			
+			TableMapReduceUtil.initTableMapperJob(StaticIdentifier.urlbaseName, scan, URLMapper.class,
+					NullWritable.class, Text.class, jobgeturl);
+			jobgeturl.setNumReduceTasks(1);
+			FileOutputFormat.setOutputPath(jobgeturl, new Path("/spider"));
+			jobgeturl.setReducerClass(URLReducer.class);
+			ControlledJob ctrljobgeturl = new ControlledJob(configuration);
+			ctrljobgeturl.setJob(jobgeturl);
 
+			Job jobUpdateURL = new Job(configuration, "updateURL");
 
-	
-		
-		Job jobDownload = new Job(conf);
-		jobDownload.setJarByClass(DownLoadMR.class); //
-		jobDownload.setMapperClass(Mapper1.class);
-		jobDownload.setMapOutputKeyClass(Text.class);
-		jobDownload.setMapOutputValueClass(Text.class);
+			jobUpdateURL.setJarByClass(DownLoadMR.class);
+			jobUpdateURL.setInputFormatClass(TextInputFormat.class);
+			FileInputFormat.addInputPath(jobUpdateURL, new Path("/url/url.txt"));
 
-		jobDownload.setReducerClass(MultipleOutputsReducer.class);
-		jobDownload.setOutputKeyClass(Text.class);
-		jobDownload.setOutputValueClass(Text.class); // 设置输出文件类型
-		MultipleOutputs.addNamedOutput(jobDownload, "KeySplit", TextOutputFormat.class, NullWritable.class, Text.class);
+			jobUpdateURL.setMapOutputKeyClass(Text.class);
+			jobUpdateURL.setMapOutputValueClass(Text.class);
+			jobUpdateURL.setMapperClass(InsertMapper.class);
+			TableMapReduceUtil.initTableReducerJob(StaticIdentifier.urlbaseName, InsertReuducer.class, jobUpdateURL);
+			ControlledJob ctrljobUpdateURL = new ControlledJob(configuration);
+			ctrljobUpdateURL.setJob(jobUpdateURL); // 依赖关系
+			//ctrljobUpdateURL.addDependingJob(ctrljobgeturl);
+*/
+			Job jobDownload = new Job(conf);
+			jobDownload.setJarByClass(DownLoadMR.class); //
+			jobDownload.setMapperClass(Mapper1.class);
+			jobDownload.setMapOutputKeyClass(Text.class);
+			jobDownload.setMapOutputValueClass(Text.class);
 
-		FileInputFormat.addInputPath(jobDownload, new Path("/spider"));
-		FileOutputFormat.setOutputPath(jobDownload, new Path("/spider/out"));
+			jobDownload.setReducerClass(MultipleOutputsReducer.class);
+			jobDownload.setOutputKeyClass(Text.class);
+			jobDownload.setOutputValueClass(Text.class); // 设置输出文件类型
+			MultipleOutputs.addNamedOutput(jobDownload, "KeySplit", TextOutputFormat.class, NullWritable.class,
+					Text.class);
 
-		ControlledJob ctrljobDownload = new ControlledJob(conf);
-		ctrljobDownload.setJob(jobDownload); // 依赖关系
-		ctrljobDownload.addDependingJob(ctrljobUpdateURL);
+			FileInputFormat.addInputPath(jobDownload, new Path("/url/url.txt"));
+			FileOutputFormat.setOutputPath(jobDownload, new Path("/spider/out"));
 
+			ControlledJob ctrljobDownload = new ControlledJob(conf);
+			ctrljobDownload.setJob(jobDownload); // 依赖关系
+			//ctrljobDownload.addDependingJob(ctrljobUpdateURL);
 
-		Job jobSaveDatabase = new Job(conf, "Join3");
+			Job jobSaveDatabase = new Job(conf, "Join3");
 
-		jobSaveDatabase.setMapperClass(Map_extract1.class);
-		jobSaveDatabase.setInputFormatClass(WholeFileInputFormat.class);
+			jobSaveDatabase.setMapperClass(Map_extract1.class);
+			jobSaveDatabase.setInputFormatClass(WholeFileInputFormat.class);
 
-		jobSaveDatabase.setMapOutputKeyClass(ImmutableBytesWritable.class);
-		jobSaveDatabase.setMapOutputValueClass(Put.class);
-		jobSaveDatabase.setOutputFormatClass(MultiTableOutputFormat.class);
+			jobSaveDatabase.setMapOutputKeyClass(ImmutableBytesWritable.class);
+			jobSaveDatabase.setMapOutputValueClass(Put.class);
+			jobSaveDatabase.setOutputFormatClass(MultiTableOutputFormat.class);
 
-		jobSaveDatabase.setJarByClass(DownLoadMR.class);
+			jobSaveDatabase.setJarByClass(DownLoadMR.class);
 
-		jobSaveDatabase.setOutputKeyClass(Text.class);
-		jobSaveDatabase.setOutputValueClass(Text.class);
-		TableMapReduceUtil.addDependencyJars(jobSaveDatabase);
-		TableMapReduceUtil.addDependencyJars(jobSaveDatabase.getConfiguration());
-		jobSaveDatabase.setNumReduceTasks(0);
-		FileInputFormat.addInputPath(jobSaveDatabase, new Path("/spider/out/om/city"));
+			jobSaveDatabase.setOutputKeyClass(Text.class);
+			jobSaveDatabase.setOutputValueClass(Text.class);
+			TableMapReduceUtil.addDependencyJars(jobSaveDatabase);
+			TableMapReduceUtil.addDependencyJars(jobSaveDatabase.getConfiguration());
+			jobSaveDatabase.setNumReduceTasks(0);
+			FileInputFormat.addInputPath(jobSaveDatabase, new Path("/spider/out/om"));
 
-		ControlledJob ctrljobSaveDatabase = new ControlledJob(conf);
-		ctrljobSaveDatabase.setJob(jobSaveDatabase); // 依赖关系
-		ctrljobSaveDatabase.addDependingJob(ctrljobDownload);
+			ControlledJob ctrljobSaveDatabase = new ControlledJob(conf);
+			ctrljobSaveDatabase.setJob(jobSaveDatabase); // 依赖关系
+			ctrljobSaveDatabase.addDependingJob(ctrljobDownload);
 
-		JobControl jobControl = new JobControl("myctrl");
-		jobControl.addJob(ctrljobgeturl);
-		jobControl.addJob(ctrljobUpdateURL);
-		jobControl.addJob(ctrljobDownload);
-		jobControl.addJob(ctrljobSaveDatabase);
+			JobControl jobControl = new JobControl("myctrl");
+			//jobControl.addJob(ctrljobgeturl);
+			//jobControl.addJob(ctrljobUpdateURL);
+			jobControl.addJob(ctrljobDownload);
+			jobControl.addJob(ctrljobSaveDatabase);
 
-
-		Thread thread = new Thread(jobControl);
-		thread.start();
-		while (true) {
-			if (jobControl.allFinished()) {
-				System.out.println(jobControl.getSuccessfulJobList());
-				jobControl.stop();
-				break;
+			Thread thread = new Thread(jobControl);
+			thread.start();
+			while (true) {
+				if (jobControl.allFinished()) {
+					System.out.println(jobControl.getSuccessfulJobList());
+					jobControl.stop();
+					break;
+				}
 			}
-		}
-		recreateFolder(new Path("/spider"), conf);
+			testForHbase.insertByURL(testForHbase.QueryURL(StaticIdentifier.tmpurlbaseName));
+			recreateFolder(new Path("/spider"), conf);
 
+		}
 	}
-}

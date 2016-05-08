@@ -23,125 +23,130 @@ public class XPATHFOR {
 	public static void exact(String htmls) {
 		List<String> results = new ArrayList();
 		Document doc = Jsoup.parse(htmls);
-		String result = Xsoup.select(doc, "//div[@class='container-fluid']/footer/p/text()").get();
-		Pattern pattern2 = Pattern.compile("(?<=时间).*?(?=。空气)");
-		Matcher matcher2 = pattern2.matcher(result);
-		String tmp = "";
-		while (matcher2.find()) {
-			tmp += matcher2.group();
-		}
-
-		/// List<String> ss = page.getHtml().xpath("//ul[@class='nav
-		/// nav-list']/li/a/@href").all();
-		/// 抽取網頁
-		/// List<String> ss = page.getHtml().xpath("//div[@class='span4
-		/// pmblock']/h2/div/div/a/@href").all();
-		/// 抽取城市
-		///
 		
-		List<String> GetProVince = Xsoup.select(doc, "//ul[@class='nav nav-list']/li/a/@href").list();
-    	
-   	//List<String> ProvinceGetCity = Xsoup.select(doc,"//div[@class='span4 pmblock']/h2/div/div/a/@href").list();
-   	 /*
-   	Iterator it1 = GetProVince.iterator();
-   	Pattern pattern3 = Pattern.compile("(?<=//).*");
-   	while (it1.hasNext()) {
-   		String temps = (String) it1.next();
-   		Matcher matcher3 = pattern3.matcher(temps);
-   		String tmps = "";
-   		while (matcher3.find()) {
-			tmps += matcher3.group();
+		List<dataStruct> PMresults = new ArrayList();
+		List<String> URLresults = new ArrayList();
+
+		String result = Xsoup.select(doc, "//div[@class='container-fluid']/footer/p/text()").get();
+		Pattern datepattern = Pattern.compile("(?<=时间).*?(?=。空气)");
+		Matcher datematcher = datepattern.matcher(result);
+		String dataTime = "";
+		while (datematcher.find()) {
+			dataTime += datematcher.group();
 		}
-        System.out.println(tmps);
-   	}
-   	*/
-   	
 
+		String cityurl = Xsoup.select(doc, "link[@rel='canonical']/@href").get();
 
-	String cityurl = Xsoup.select(doc, "link[@rel='canonical']/@href").get();
-	Pattern pattern3 = Pattern.compile("(?<=city/).*?(?=.html)");
-	Matcher matcher3 = pattern3.matcher(cityurl);
-	Pattern pattern4 = Pattern.compile("(?<=//).*");
-	String cityname = "";
-	while (matcher3.find()) {
-		cityname += matcher3.group();
-	}
+		Pattern pattern3 = Pattern.compile("(?<=city/).*?(?=.html)");
+		Matcher matcher3 = pattern3.matcher(cityurl);
+		Pattern pattern4 = Pattern.compile("(?<=//).*");
+		String cityname = "";
+		while (matcher3.find()) {
+			cityname += matcher3.group();
+		}
+		int num = 0;
 
-	List<String> stations = Xsoup.select(doc, "//div[@class='span4 pmblock']").list();
-	Iterator it123 = stations.iterator();
-	while (it123.hasNext()) {
-		String stan = (String) it123.next();
-		String stanname = Xsoup.select(stan, "div[@class='staname']/@title").get();
-			Elements site_tags = doc.select("div." + "staname" + "[title=" + stanname + "]");
-			Integer pm25 = -2;
-			Integer pm10 = -2;
-			Integer aqi = -2;
-			if (site_tags.size() != 0) {
+		if (!cityurl.equals("http://www.soupm25.com/city/beijing.html")) {
 
-				String pm25_str = site_tags.first().parent().parent().parent().child(1).child(0).child(1).child(0)
-						.child(1).text().replace(" ug/m3", "");
-				if (StringUtils.isNumeric(pm25_str)) {
-					pm25 = Integer.valueOf(pm25_str);
-				} else {
-					pm25 = -1;
+			List<String> stations = Xsoup.select(doc, "//div[@class='span4 pmblock']").list();
+			Iterator it1 = stations.iterator();
+			while (it1.hasNext()) {
+				String stan = (String) it1.next();
+				String stanname = Xsoup.select(stan, "div[@class='staname']/@title").get();
+				try {
+					Elements site_tags = doc.select("div." + "staname" + "[title=" + stanname + "]");
+					Integer pm25 = -2;
+					Integer pm10 = -2;
+					Integer aqi = -2;
+					if (site_tags.size() != 0) {
+
+						String pm25_str = site_tags.first().parent().parent().parent().child(1).child(0).child(1)
+								.child(0).child(1).text().replace(" ug/m3", "");
+						if (StringUtils.isNumeric(pm25_str)) {
+							pm25 = Integer.valueOf(pm25_str);
+						} else {
+							pm25 = -1;
+						}
+
+						String pm10_str = site_tags.first().parent().parent().parent().child(1).child(0).child(1)
+								.child(2).child(1).text().replace(" ug/m3", "");
+						;
+
+						if (StringUtils.isNumeric(pm10_str)) {
+							pm10 = Integer.valueOf(pm10_str);
+						} else {
+							pm10 = -1;
+						}
+						// String output_result = stanname + " PM2.5: " +
+						// pm25_str +
+						// " PM10: " + pm10_str;
+						System.out.println(cityname+" "+stanname+" "+dataTime+" "+ pm25_str+" "+ pm10_str+" "+ num);
+
+	
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
 				}
-
-				String pm10_str = site_tags.first().parent().parent().parent().child(1).child(0).child(1).child(2)
-						.child(1).text().replace(" ug/m3", "");
-				;
-
-				if (StringUtils.isNumeric(pm10_str)) {
-					pm10 = Integer.valueOf(pm10_str);
-				} else {
-					pm10 = -1;
-				}
-				// String output_result = stanname + " PM2.5: " + pm25_str +
-				// " PM10: " + pm10_str;
-				System.out.println(cityname+stanname+pm25_str+ pm10_str);
 			}
+		} else {
+			List<String> beijingstan = Xsoup.select(doc, "//table[@class='table table-hover']/tbody/tr/td/div/@title")
+					.list();
+
+			Iterator itbj = beijingstan.iterator();
+			while (itbj.hasNext()) {
+
+				String bjstanname = (String) itbj.next();
+				Elements site_tags = doc.select("div." + "allstaname" + "[title=" + bjstanname + "]");
+
+				// System.out.println(site_tags);
+
+				Integer pm25 = -2;
+				Integer pm10 = -2;
+				Integer aqi = -2;
+				String beij = "Beijing";
+				// System.out.println(site_tags.size());
+				if (site_tags.size() != 0) {
+
+					String pm25_str = site_tags.first().parent().parent().child(1).text().replace(" ug/m3", "");
+					if (StringUtils.isNumeric(pm25_str)) {
+						pm25 = Integer.valueOf(pm25_str);
+					} else {
+						pm25 = -1;
+					}
+
+					String pm10_str = site_tags.first().parent().parent().child(2).text().replace(" ug/m3", "");
+					;
+
+					if (StringUtils.isNumeric(pm10_str)) {
+						pm10 = Integer.valueOf(pm10_str);
+					} else {
+						pm10 = -1;
+					}
+					System.out.println(cityname+" "+bjstanname+" "+dataTime+" "+ pm25_str+" "+ pm10_str+" "+ num);
+
+				}
+			}
+		}
+		List<String> GetProVince = Xsoup.select(doc, "//ul[@class='nav nav-list']/li/a/@href").list();
+
+		Iterator proit = GetProVince.iterator();
+
+		while (proit.hasNext()) {
+			String tmpurl = (String) proit.next();
+			Matcher matcher4 = pattern4.matcher(tmpurl);
+			String matchurl = "";
+			while (matcher4.find()) {
+				matchurl += matcher4.group();
+			}
+			System.out.println(("http://" + matchurl));
+		}
 	}
-	}
 
-
-
-//Iterator it2 = ProvinceGetCity.iterator();
-  
-
-
-	/*
-	 * 
-	 * String cityurl = Xsoup.select(doc, "link[@rel='canonical']/@href").get();
-	 * Pattern pattern3 = Pattern.compile("(?<=city/).*?(?=.html)"); Matcher
-	 * matcher3 = pattern3.matcher(cityurl); String tmpss = ""; while
-	 * (matcher3.find()) { tmpss += matcher3.group(); }
-	 * 
-	 * List<String> stations = Xsoup.select(doc, "//div[@class='span4 pmblock']"
-	 * ).list(); Iterator it1 = stations.iterator(); while (it1.hasNext()) {
-	 * String stan = (String) it1.next(); String stanname = Xsoup.select(stan,
-	 * "div[@class='staname']/@title").get(); try { Elements site_tags =
-	 * doc.select("div." + "staname" + "[title=" + stanname + "]"); Integer pm25
-	 * = -2; Integer pm10 = -2; Integer aqi = -2; if (site_tags.size() != 0) {
-	 * 
-	 * String pm25_str =
-	 * site_tags.first().parent().parent().parent().child(1).child(0).child(1).
-	 * child(0) .child(1).text().replace(" ug/m3", ""); if
-	 * (StringUtils.isNumeric(pm25_str)) { pm25 = Integer.valueOf(pm25_str); }
-	 * else { pm25 = -1; }
-	 * 
-	 * String pm10_str =
-	 * site_tags.first().parent().parent().parent().child(1).child(0).child(1).
-	 * child(2) .child(1).text().replace(" ug/m3", ""); ;
-	 * 
-	 * if (StringUtils.isNumeric(pm10_str)) { pm10 = Integer.valueOf(pm10_str);
-	 * } else { pm10 = -1; } String output_result = stanname + " PM2.5: " +
-	 * pm25_str + " PM10: " + pm10_str; results.add(output_result); } } catch
-	 * (Exception e) { // TODO: handle exception } }
-	 */
 
 
 	public static void main(String[] args) {
 		BfsSpider crawler = new BfsSpider();
-		exact(crawler.crawling("http://www.soupm25.com/city/beijing.html"));
+		exact(crawler.crawling("http://www.soupm25.com/city/jinan.html"));
 
 	}
 }

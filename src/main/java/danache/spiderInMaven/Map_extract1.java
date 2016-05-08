@@ -74,7 +74,7 @@ public class Map_extract1 extends Mapper<Object, BytesWritable, ImmutableBytesWr
 			put.add("visited".getBytes(), null,StaticIdentifier.noVisited.getBytes());
 			if (!put.isEmpty()) {
 				ImmutableBytesWritable ib = new ImmutableBytesWritable();
-				ib.set(Bytes.toBytes(StaticIdentifier.urlbaseName));
+				ib.set(Bytes.toBytes(StaticIdentifier.tmpurlbaseName));
 				context.write(ib, put);// 将结果存入hbase表
 			}
 			

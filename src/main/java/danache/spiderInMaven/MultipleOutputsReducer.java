@@ -27,7 +27,7 @@ public class MultipleOutputsReducer extends Reducer<Text, Text, NullWritable, Te
 
 	private String generateFileName(Text value) {
 		String split = value.toString();
-		String country = split.substring(20, 35);
+		String country = split.substring(20, split.length() -1);
 		return country;
 	}
 
