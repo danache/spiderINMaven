@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/*
+ * 获取抽取信息并存入hbase中
+ */
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;

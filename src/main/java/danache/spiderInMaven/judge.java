@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/*
+ * 页面抽取元素工具
+ */
 import java.util.ArrayList;
 import danache.spiderInMaven.dataStruct;
 import java.util.Iterator;

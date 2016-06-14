@@ -1,7 +1,9 @@
 package danache.spiderInMaven;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,6 +12,8 @@ import javax.inject.Qualifier;
 import org.apache.commons.lang.ObjectUtils.Null;
 import org.apache.curator.retry.RetryUntilElapsed;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -34,6 +38,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.htrace.fasterxml.jackson.annotation.JsonTypeInfo.None;
 import org.relaxng.datatype.helpers.ParameterlessDatatypeBuilder;
 
+
 public class testForHbase {
 
 	public static Configuration configuration;
@@ -43,6 +48,8 @@ public class testForHbase {
 	}
 
 	public static void main(String[] args) throws IOException {
+		//createTable("dataTime", "time");
+		//QueryAll("dataTime");
 		/*
 		
 		String initURL1 = "http://www.soupm25.com/province/35.html";
@@ -57,8 +64,9 @@ public class testForHbase {
 		
 		//insertByURL(QueryURL(StaticIdentifier.tmpurlbaseName));
 		//QueryAll(StaticIdentifier.tmpurlbaseName);
-		createTable(StaticIdentifier.databaseName, StaticIdentifier.PMdataFamilyInHbase);
-		QueryAll(StaticIdentifier.databaseName);
+		//createTable(StaticIdentifier.databaseName, StaticIdentifier.PMdataFamilyInHbase);
+		//QueryAll(StaticIdentifier.databaseName);
+		//QueryByRowkey(StaticIdentifier.databaseName);
 		//QueryAll(StaticIdentifier.urlbaseName);
 
 		// String testTable = "testTable";
@@ -68,8 +76,9 @@ public class testForHbase {
 		// QueryByCondition3("wujintao");
 		// deleteRow("wujintao","abcdef");
 		// deleteByCondition("wujintao","abcdef");
-	
+		QueryByRowkey("pmdata");
 	}
+	
 
 	public static void createTable(String tableName, String famaly) {
 		//System.out.println("start create table ......");
@@ -213,21 +222,42 @@ public class testForHbase {
 		return ishave;
 	}
 
-	public static void QueryByCondition1(String tableName) {
+	public static void QueryByRowkey(String tableName) throws IOException {
+		Configuration conf = HBaseConfiguration. create ();
 
-		HTablePool pool = new HTablePool(configuration, 1000);
-		HTable table = (HTable) pool.getTable(tableName);
-		try {
-			Get scan = new Get("abcdef".getBytes());// 根据rowkey查询
-			Result r = table.get(scan);
-			System.out.println("获得到rowkey:" + new String(r.getRow()));
-			for (KeyValue keyValue : r.raw()) {
-				System.out
-						.println("列：" + new String(keyValue.getFamily()) + "====值:" + new String(keyValue.getValue()));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		HTable table = new HTable(configuration, tableName);
+
+        Scan s =  new  Scan();
+        
+        s. setStartRow (Bytes. toBytes ( "beijing昌平镇1464710400000"));
+
+        s. setStopRow (Bytes. toBytes ( "beijing昌平镇1464856414"));
+
+        
+
+        ResultScanner rs = table.getScanner(s);
+
+         for  (Result r : rs) {
+
+             for  (Cell cell : r.rawCells()) {
+
+                System. out .println(
+
+                         "Rowkey : " +Bytes. toString (r.getRow())+
+
+                         "   Familiy:Quilifier : " +Bytes. toString (CellUtil. cloneQualifier(cell))+
+
+                         "   Value : " +Bytes. toString (CellUtil. cloneValue (cell))+
+
+                         "   Time : " +cell.getTimestamp()
+
+                        );
+
+            }
+
+        }
+
+        table.close();
 	}
 
 	public static void QueryByCondition2(String tableName) {

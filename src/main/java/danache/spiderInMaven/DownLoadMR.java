@@ -1,5 +1,9 @@
 package danache.spiderInMaven;
-
+/*
+ * 程序主函数
+ * 
+ * 
+ */
 import org.apache.hadoop.hbase.mapreduce.MultiTableOutputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
