@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/***
+ * 抽取数据返回形式
+ */
 import java.util.List;
 
 

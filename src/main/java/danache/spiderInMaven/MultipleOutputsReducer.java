@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/**
+ * 将每个网页单独输出成文件
+ */
 import java.io.IOException;
 
 import org.apache.hadoop.io.NullWritable;

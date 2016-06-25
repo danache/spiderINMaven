@@ -1,6 +1,5 @@
 package danache.spiderInMaven;
-/*
- * 程序主函数
+/**程序主函数
  * 
  * 
  */
@@ -33,7 +32,7 @@ import junit.framework.Test;
 import us.codecraft.webmagic.downloader.Downloader;
 
 public class DownLoadMR {
-
+//每次任务开始前清空路径
 	private static void recreateFolder(Path path, Configuration conf) throws IOException {
 		FileSystem fs = path.getFileSystem(conf);
 		if (fs.exists(path)) {
@@ -42,14 +41,17 @@ public class DownLoadMR {
 	}
 
 	public static void main(String[] args) throws Exception {
+		//HBase查询参数定义
 		Configuration conf = new Configuration();
 		Configuration configuration = HBaseConfiguration.create();
 		Scan scan = new Scan();
 		scan.setCaching(500);
 		scan.setCacheBlocks(false);
+		
 	//	testForHbase.createTable(StaticIdentifier.urlbaseName, StaticIdentifier.urlbaseFamily);
 		
 /*
+ * 		//jobgeturl用于从Hbase中读取将要爬取的URL
 			Job jobgeturl = new Job(configuration, "example");
 			jobgeturl.setJarByClass(Downloader.class);
 
@@ -61,7 +63,7 @@ public class DownLoadMR {
 			jobgeturl.setReducerClass(URLReducer.class);
 			ControlledJob ctrljobgeturl = new ControlledJob(configuration);
 			ctrljobgeturl.setJob(jobgeturl);
-
+			//jobUpdateURL用于将之前获取的URL放入URL池中
 			Job jobUpdateURL = new Job(configuration, "updateURL");
 
 			jobUpdateURL.setJarByClass(DownLoadMR.class);
@@ -76,6 +78,7 @@ public class DownLoadMR {
 			ctrljobUpdateURL.setJob(jobUpdateURL); // 依赖关系
 			//ctrljobUpdateURL.addDependingJob(ctrljobgeturl);
 */
+			//对URL池中的url进行下载
 			Job jobDownload = new Job(conf);
 			jobDownload.setJarByClass(DownLoadMR.class); //
 			jobDownload.setMapperClass(Mapper1.class);
@@ -94,7 +97,7 @@ public class DownLoadMR {
 			ControlledJob ctrljobDownload = new ControlledJob(conf);
 			ctrljobDownload.setJob(jobDownload); // 依赖关系
 			//ctrljobDownload.addDependingJob(ctrljobUpdateURL);
-
+			//将下载的数据存入Hbase中
 			Job jobSaveDatabase = new Job(conf, "Join3");
 
 			jobSaveDatabase.setMapperClass(Map_extract1.class);

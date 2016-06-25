@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/**
+ * 获取URL并下载储存
+ */
 import java.io.IOException;
 
 import org.apache.hadoop.hbase.client.Put;

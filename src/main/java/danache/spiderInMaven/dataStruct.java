@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/**
+ * PM25天气数据格式
+ */
 import org.apache.hadoop.hbase.generated.regionserver.region_jsp;
 
 public class dataStruct {

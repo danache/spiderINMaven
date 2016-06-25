@@ -1,5 +1,7 @@
 package danache.spiderInMaven;
-
+/**
+ * 用于更新URL池的Mapper
+ */
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;

@@ -1,3 +1,6 @@
+/***
+ * 调用downloadFile函数，传入url参数，获得的网页内容以字节数组形式返回。 
+ */
 package danache.spiderInMaven;
 
 
